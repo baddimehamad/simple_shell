@@ -1,30 +1,51 @@
 #ifndef MAIN_H
 #define MAIN_H
 /**
- * all functions
+ * unistd - functions
+ * access, chdir, close, execve, getpid, isatty, kill,
+ * open, read, signal, wait, waitpid, wait3, wait4, write
  */
 #include <unistd.h>
-#include <stdlib.h>   
-#include <stdio.h>   
-#include <dirent.h>   
-#include <sys/stat.h> 
-#include <sys/wait.h> 
-#include <string.h>   
+#include <stdlib.h>   /* exit, _exit, free, malloc */
+#include <stdio.h>    /* fflush, perror */
+#include <dirent.h>   /* closedir, opendir, readdir */
+#include <sys/stat.h> /* stat, lstat, fstat */
+#include <sys/wait.h> /* wait */
+#include <string.h>   /* strtok */
 #define BUFFER_SIZE 1024
 #define MAX_TOKENS 100
 extern char **environ;
-
-typedef struct the_node
+/**
+ * struct CommandNode - singly linked list
+ * @command: string - (malloc'ed string)
+ * @next: points to the next node
+ * Description: singly linked list node
+ */
+typedef struct CommandNode
 {
 	char command[100];
-	struct the_node *next;
-} the_node;
-
-typedef struct historique_c
+	struct CommandNode *next;
+} CommandNode;
+/**
+ * struct CommandHistory - singly linked list
+ * @head: CommandNode head
+ * @tail: CommandNode tail
+ * Description: singly linked list node structure
+ */
+typedef struct CommandHistory
 {
-	the_node *head;
-	the_node *tail;
-} historique_c;
+	CommandNode *head;
+	CommandNode *tail;
+} CommandHistory;
+
+/**
+ * struct ENV - simple envirenment variable details
+ * Struct.
+ * @index: envirenment variable index
+ * @key: envirenment variable key
+ * @value: envirenment variable value
+ * Description: simple envirenment variable details structure
+ */
 
 typedef struct ENV
 {
@@ -32,31 +53,30 @@ typedef struct ENV
 	char *key;
 	char *value;
 } ENV;
-historique_c *the_history_create();
-char *concat_string(const char **strings, int count);
-void clear_h(historique_c *history);
-int clear_console(void);
-int commands_builtin(char *cmds[64]);
-char *get_the_last_directory(const char *path);
-char *string_reallocation(char *ptr, size_t size);
-char *string_copy(char *dest, const char *src);
-char **split_text(const char *str, char delimiter, int *numTokens);
-void print_h(const historique_c *history);
-void history_add(historique_c *history, const char *command);
-int lenght_string(const char *f);
-void execution(int ac, char **av, historique_c *history);
-int string_p(char c);
-char *env_0(const char *name);
-ENV *get_envirement(char *key);
-char *string_to_chars(const char *str, int character);
-char *string_dump(const char *str);
-char *link_find(char *buffer);
-int change_folder(char *path);
-int string_put(char *c);
-int envirement_set(const char *key, const char *value);
-int compare_strings(const char *str1, const char *str2, size_t n);
+CommandHistory *create_history();
+char *join_strings(const char **strings, int count);
+char **splitString(const char *str, char delimiter, int *numTokens);
+void print_history(const CommandHistory *history);
+void clear_history(CommandHistory *history);
+void add_to_history(CommandHistory *history, const char *command);
+int _strlen(const char *f);
+void handle_exec(int ac, char **av, CommandHistory *history);
+int _putchar(char c);
+int clear_screen(void);
+int switch_builtin_command(char *cmds[64]);
+char *getLastDirectory(const char *path);
+char *_strrealloc(char *ptr, size_t size);
+char *_strcpy(char *dest, const char *src);
+char *_getenv0(const char *name);
+ENV *_getenv(char *key);
+int _putstr(char *c);
+int _setenv(const char *key, const char *value);
+int _strncmp(const char *str1, const char *str2, size_t n);
+char *_strchr(const char *str, int character);
+char *_strdup(const char *str);
+char *find_command_path(char *buffer);
+int change_directory(char *path);
+int print_environment();
+void run(char *buffer, CommandHistory *history);
 
-int get_env();
-void the_exec_run(char *buffer, historique_c *history);
-
-#endif
+#endif /*MAIN_H*/
